@@ -142,11 +142,11 @@ class ResultActivity : AppCompatActivity() {
     private fun getTagContent(txt: String): String {
         val pattern: Pattern = Pattern.compile("[.*]?(<one>)([а-яА-Я\\s]*)(</one>)[.*]?")
         val matcher: Matcher = pattern.matcher(txt)
-        var g = ""
+        var content = ""
         if (matcher.find()) {
-            g = matcher.group(2)
+            content = matcher.group(2)
         }
-        return g
+        return content
     }
 
     private fun getModifiedLink(value: String): String {
