@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">Lesson16</string>
+
+    <string name="open">open</string>
+    <string name="close">close</string>
+
+    <string name="home_page">Главный экран</string>
+    <string name="settings">Настройки</string>
+    <string name="hint_input_text">Input text</string>
+    <string name="txt_btn_result">result</string>
+
+    <string name="title_parse_one">Парсилка 1</string>
+    <string name="title_parse_two">Парсилка 2</string>
+    <string name="title_parse_three">Парсилка 3</string>
+    <string name="title_parse_four">Парсилка 4</string>
+    <string name="title_parse_five">Парсилка 5</string>
+
+    <string name="summary_parse_one">Все пробелы на минусы</string>
+    <string name="summary_parse_two">Изменение телефонного номера</string>
+    <string name="summary_parse_three">Изменение слов из 4-х букв</string>
+    <string name="summary_parse_four">Изменение по тэгам</string>
+    <string name="summary_parse_five">Изменение ссылки</string>
+
+    <string name="phone_code">+375</string>
+    <string name="txt_http"> http://</string>
+
+</resources>

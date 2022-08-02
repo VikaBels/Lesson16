@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:icon="@drawable/ic_baseline_looks_one_24"
+        android:key="parseOne"
+        android:summary="@string/summary_parse_one"
+        android:title="@string/title_parse_one" />
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:icon="@drawable/ic_baseline_looks_two_24"
+        android:key="parseTwo"
+        android:summary="@string/summary_parse_two"
+        android:title="@string/title_parse_two" />
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:icon="@drawable/ic_baseline_looks_3_24"
+        android:key="parseThree"
+        android:summary="@string/summary_parse_three"
+        android:title="@string/title_parse_three" />
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:icon="@drawable/ic_baseline_looks_4_24"
+        android:key="parseFour"
+        android:summary="@string/summary_parse_four"
+        android:title="@string/title_parse_four" />
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:icon="@drawable/ic_baseline_looks_5_24"
+        android:key="parseFive"
+        android:summary="@string/summary_parse_five"
+        android:title="@string/title_parse_five" />
+
+</PreferenceScreen>
