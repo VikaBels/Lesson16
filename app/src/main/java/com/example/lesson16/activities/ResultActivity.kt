@@ -66,8 +66,8 @@ class ResultActivity : AppCompatActivity() {
     private fun parseThreeCapsLkFourLatterWords(receivedText: String?): String? {
         val regex = "\\b[а-яА-Яa-zA-Z]{4}\\b".toRegex()
         val modifiedText = receivedText?.let {
-            regex.replace(it) { m ->
-                m.value.uppercase()
+            regex.replace(it) { word ->
+                word.value.uppercase()
             }
         }
         return modifiedText
@@ -76,8 +76,8 @@ class ResultActivity : AppCompatActivity() {
     private fun parseFourFindTxtInTag(receivedText: String?): String? {
         val regex = "[.*]?(<one>)([а-яА-Я\\s0-9a-zA-Z]*)(</one>)[.*]?".toRegex()
         val modifiedText = receivedText?.let {
-            regex.replace(it) { m ->
-                getTagContent(m.value)
+            regex.replace(it) { contentTag ->
+                getTagContent(contentTag.value)
             }
         }
         return modifiedText
@@ -86,8 +86,8 @@ class ResultActivity : AppCompatActivity() {
     private fun parseFiveChangeLink(receivedText: String?): String? {
         val regex = "[\\s]www\\.[A-z0-9]+\\.(com|ru)[\\s]".toRegex()
         val modifiedText = receivedText?.let {
-            regex.replace(it) { m ->
-                getModifiedLink(m.value)
+            regex.replace(it) { link ->
+                getModifiedLink(link.value)
             }
         }
         return modifiedText
