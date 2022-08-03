@@ -3,7 +3,6 @@ package com.example.lesson16.activities
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
-import com.example.lesson16.KEY_TRANSMISSION_TEXT
 import com.example.lesson16.R
 import com.example.lesson16.databinding.ActivityResultBinding
 import java.util.regex.Matcher
@@ -11,11 +10,24 @@ import java.util.regex.Pattern
 
 class ResultActivity : AppCompatActivity() {
     companion object {
+        const val KEY_TRANSMISSION_TEXT = "get_put_txt"
+
         const val KEY_PARSE_ONE = "parseOne"
         const val KEY_PARSE_TWO = "parseTwo"
         const val KEY_PARSE_THREE = "parseThree"
         const val KEY_PARSE_FOUR = "parseFour"
         const val KEY_PARSE_FIVE = "parseFive"
+
+        const val REGEX_WHITESPACES_CHANGE = """(?:(?!\n)\s)+"""
+        val REGEX_PHONE_CHANGE =
+            """([\s]?8[\s])(\(0(\d{2})\)[\s])((\d{3}[\-])(\d{2}[\-])(\d{2}))[\s]?""".toRegex()
+        val REGEX_CAPS_FOUR_LATTER_WORDS = """\b[а-яА-Яa-zA-Z]{4}\b""".toRegex()
+        val REGEX_FOUND_TEXT_IN_TAG =
+            """[.*]?(<one>)([а-яА-Я\s0-9a-zA-Z]*)(</one>)[.*]?""".toRegex()
+        val REGEX_LINK_CHANGE = """[\s]www\.[A-z0-9]+\.(com|ru)[\s]""".toRegex()
+
+        const val INDEX_GROUP_CODE = 3
+        const val INDEX_GROUP_NUMBER = 4
     }
 
     private var bindingResult: ActivityResultBinding? = null
@@ -28,7 +40,8 @@ class ResultActivity : AppCompatActivity() {
 
         addToolBar()
 
-        bindingResult?.container?.text = modifiedTxtByCheckBox()
+        bindingResult?.container?.text =
+            applyRegexes(intent.extras?.get(KEY_TRANSMISSION_TEXT).toString())
     }
 
     override fun onDestroy() {
@@ -48,105 +61,60 @@ class ResultActivity : AppCompatActivity() {
         }
     }
 
-    private fun parseOneReplaceSpaces(receivedText: String?): String? {
-        return receivedText?.replace(Regex("(?:(?!\\n)\\s)+"), "-")
+    private fun replaceWhitespaces(receivedText: String?): String? {
+        return receivedText?.replace(Regex(REGEX_WHITESPACES_CHANGE), "-")
     }
 
-    private fun parseTwoChangeNumberPhone(receivedText: String?): String? {
-        val regex =
-            "([\\s]?8[\\s])(\\(0\\d{2}\\)[\\s])(\\d{3}[\\-])(\\d{2}[\\-])(\\d{2})[\\s]?".toRegex()
-        val modifiedText = receivedText?.let {
-            regex.replace(it) { txtNumber ->
+    private fun changeNumberPhone(receivedText: String?): String? {
+        val regex = REGEX_PHONE_CHANGE
+        val text = receivedText ?: return null
+
+        val modifiedText =
+            regex.replace(text) { txtNumber ->
                 getModifiedNumberPhone(txtNumber)
             }
-        }
         return modifiedText
-    }
-
-    private fun parseThreeCapsLkFourLatterWords(receivedText: String?): String? {
-        val regex = "\\b[а-яА-Яa-zA-Z]{4}\\b".toRegex()
-        val modifiedText = receivedText?.let {
-            regex.replace(it) { word ->
-                word.value.uppercase()
-            }
-        }
-        return modifiedText
-    }
-
-    private fun parseFourFindTxtInTag(receivedText: String?): String? {
-        val regex = "[.*]?(<one>)([а-яА-Я\\s0-9a-zA-Z]*)(</one>)[.*]?".toRegex()
-        val modifiedText = receivedText?.let {
-            regex.replace(it) { contentTag ->
-                getTagContent(contentTag.value)
-            }
-        }
-        return modifiedText
-    }
-
-    private fun parseFiveChangeLink(receivedText: String?): String? {
-        val regex = "[\\s]www\\.[A-z0-9]+\\.(com|ru)[\\s]".toRegex()
-        val modifiedText = receivedText?.let {
-            regex.replace(it) { link ->
-                getModifiedLink(link.value)
-            }
-        }
-        return modifiedText
-    }
-
-    private fun modifiedTxtByCheckBox(): String? {
-        val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
-
-        val sourceText = intent.extras?.get(KEY_TRANSMISSION_TEXT).toString()
-        var editedText: String? = sourceText
-
-        if (sharedPref.getBoolean(KEY_PARSE_TWO, false)) {
-            editedText = parseTwoChangeNumberPhone(editedText)
-        }
-        if (sharedPref.getBoolean(KEY_PARSE_THREE, false)) {
-            editedText = parseThreeCapsLkFourLatterWords(editedText)
-        }
-        if (sharedPref.getBoolean(KEY_PARSE_FOUR, false)) {
-            editedText = parseFourFindTxtInTag(editedText)
-        }
-        if (sharedPref.getBoolean(KEY_PARSE_FIVE, false)) {
-            editedText = parseFiveChangeLink(editedText)
-        }
-        if (sharedPref.getBoolean(KEY_PARSE_ONE, false)) {
-            editedText = parseOneReplaceSpaces(editedText)
-        }
-        return editedText
     }
 
     private fun getModifiedNumberPhone(txtNumber: MatchResult): String {
-        val beginCodePhone = 4
-        val endCodePhone = 6
-
-        val beginNumberPhone = 8
-        val endNumberPhone = 17
-
         val numberPhone = StringBuilder()
         numberPhone.append(" ${resources.getString(R.string.phone_code)}-")
-        numberPhone.append(
-            "${
-                txtNumber.value.trimStart().substring(beginCodePhone, endCodePhone)
-            }-"
-        )
-        numberPhone.append(
-            "${
-                txtNumber.value.trimStart().substring(beginNumberPhone, endNumberPhone)
-            } "
-        )
+        numberPhone.append("${txtNumber.groupValues[INDEX_GROUP_CODE]}-")
+        numberPhone.append("${txtNumber.groupValues[INDEX_GROUP_NUMBER]} ")
         return numberPhone.toString()
     }
 
-    private fun getTagContent(txt: String): String {
-        val pattern: Pattern = Pattern.compile("[.*]?(<one>)([а-яА-Я\\s]*)(</one>)[.*]?")
-        val matcher: Matcher = pattern.matcher(txt)
-        var content = ""
-        if (matcher.find()) {
-            content = matcher.group(2)
-        }
-        return content
+    private fun capsFourLatterWords(receivedText: String?): String? {
+        val regex = REGEX_CAPS_FOUR_LATTER_WORDS
+        val text = receivedText ?: return null
+
+        val modifiedText =
+            regex.replace(text) { word ->
+                word.value.uppercase()
+            }
+        return modifiedText
+    }
+
+    private fun foundTextInTag(receivedText: String?): String? {
+        val regex = REGEX_FOUND_TEXT_IN_TAG
+        val text = receivedText ?: return null
+
+        val modifiedText =
+            regex.replace(text) { contentTag ->
+                contentTag.groupValues[2]
+            }
+        return modifiedText
+    }
+
+    private fun changeLink(receivedText: String?): String? {
+        val regex = REGEX_LINK_CHANGE
+        val text = receivedText ?: return null
+
+        val modifiedText =
+            regex.replace(text) { link ->
+                getModifiedLink(link.value)
+            }
+        return modifiedText
     }
 
     private fun getModifiedLink(value: String): String {
@@ -156,5 +124,30 @@ class ResultActivity : AppCompatActivity() {
         modifiedLink.append(value.trimStart())
 
         return modifiedLink.toString()
+    }
+
+    private fun applyRegexes(
+        sourceText: String?
+    ): String? {
+        val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
+
+        var editedText: String? = sourceText
+
+        if (sharedPref.getBoolean(KEY_PARSE_TWO, false)) {
+            editedText = changeNumberPhone(editedText)
+        }
+        if (sharedPref.getBoolean(KEY_PARSE_THREE, false)) {
+            editedText = capsFourLatterWords(editedText)
+        }
+        if (sharedPref.getBoolean(KEY_PARSE_FOUR, false)) {
+            editedText = foundTextInTag(editedText)
+        }
+        if (sharedPref.getBoolean(KEY_PARSE_FIVE, false)) {
+            editedText = changeLink(editedText)
+        }
+        if (sharedPref.getBoolean(KEY_PARSE_ONE, false)) {
+            editedText = replaceWhitespaces(editedText)
+        }
+        return editedText
     }
 }

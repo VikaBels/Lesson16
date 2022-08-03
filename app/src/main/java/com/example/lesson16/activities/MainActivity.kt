@@ -10,8 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.lesson16.KEY_TRANSMISSION_TEXT
 import com.example.lesson16.R
+import com.example.lesson16.activities.ResultActivity.Companion.KEY_TRANSMISSION_TEXT
 import com.example.lesson16.adapters.MenuItemAdapter
 import com.example.lesson16.databinding.ActivityMainBinding
 import com.example.lesson16.interfaces.MenuNavigationListener
@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity(), MenuNavigationListener {
         bindingMain = null
     }
 
-    override fun switchingNewActivity(name: String) {
+    override fun openSettingsActivity(name: String) {
         if (name == resources.getString(R.string.settings)) {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
@@ -86,27 +86,25 @@ class MainActivity : AppCompatActivity(), MenuNavigationListener {
     }
 
     private fun fillingMenu(): List<ItemMenu> {
-        val listMenuItem = mutableListOf<ItemMenu>()
-        listMenuItem.add(
+        return listOf(
             ItemMenu(
                 resources.getString(R.string.home_page),
                 R.drawable.ic_baseline_home_24
-            )
-        )
-        listMenuItem.add(
+            ),
             ItemMenu(
                 resources.getString(R.string.settings),
                 R.drawable.ic_baseline_settings_24
             )
         )
-        return listMenuItem
     }
 
     private fun setUpAdapter() {
-        val adapter = MenuItemAdapter(this, fillingMenu(), this)
+        val adapterMenu = MenuItemAdapter(this, fillingMenu(), this)
 
-        bindingMain?.menuList?.adapter = adapter
-        bindingMain?.menuList?.layoutManager = LinearLayoutManager(this)
+        bindingMain?.menuList?.apply {
+            adapter = adapterMenu
+            layoutManager = LinearLayoutManager(context)
+        }
     }
 
     private fun listenerBtnResult() {

@@ -18,7 +18,7 @@ class MenuItemAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MenuItemViewHolder {
         val binding = NameItemMenuBinding.inflate(LayoutInflater.from(context), parent, false)
-        return MenuItemViewHolder(binding, listenerForFragment,context)
+        return MenuItemViewHolder(binding, listenerForFragment, context)
     }
 
     override fun onBindViewHolder(holder: MenuItemViewHolder, position: Int) {
@@ -42,7 +42,9 @@ class MenuItemAdapter(
             binding.image.setImageResource(menuItem.drawableId)
 
             binding.nameItemMenu.setOnClickListener {
-                menuItem.name?.let { it1 -> listenerForFragment?.switchingNewActivity(it1) }
+                if (menuItem.name != null) {
+                    listenerForFragment?.openSettingsActivity(menuItem.name)
+                }
                 binding.name.setTextColor(ContextCompat.getColor(context, R.color.teal_700))
             }
         }
